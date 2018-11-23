@@ -2,7 +2,6 @@ import sys
 import numpy as np
 from scipy.integrate import odeint
 
-
 # The gravitational acceleration (m.s-2).
 g = 9.81
 
@@ -44,22 +43,40 @@ def simulate_pendulum(theta_resolution):
     # Maximum time, time point spacings (all in s).
     tmax, dt = 30.0, 0.01
 
-    for theta1_init in np.linspace(0, 2*np.pi, theta_resolution):
-        for theta2_init in np.linspace(0, 2*np.pi, theta_resolution):
-            # Initial conditions: theta1, dtheta1/dt, theta2, dtheta2/dt.
-            y0 = np.array([
-                theta1_init,
-                0.0,
-                theta2_init,
-                0.0
-            ])
+    # Means to run to csv
+    import csv
+    with open('results.csv', 'wb') as csvfile:
+        spamwriter = csv.writer(csvfile)
+        spamwriter.writerow(['theta1_init', 'theta2_init',
+                                     'theta1',
+                                     'theta2',
+                                     'x1',
+                                     'y1',
+                                     'x2',
+                                     'y2'])
 
-            theta1, theta2, x1, y1, x2, y2 = solve(L1, L2, m1, m2, tmax, dt, y0)
+        for theta1_init in np.linspace(0, 2*np.pi, theta_resolution):
+            for theta2_init in np.linspace(0, 2*np.pi, theta_resolution):
+                # Initial conditions: theta1, dtheta1/dt, theta2, dtheta2/dt.
+                y0 = np.array([
+                    theta1_init,
+                    0.0,
+                    theta2_init,
+                    0.0
+                ])
 
-            print theta1_init, theta2_init, theta1[-1], theta2[-1]
+                theta1, theta2, x1, y1, x2, y2 = solve(L1, L2, m1, m2, tmax, dt, y0)
+                spamwriter.writerow([theta1_init, theta2_init,
+                                     theta1[-1],
+                                     theta2[-1],
+                                     x1[-1],
+                                     y1[-1],
+                                     x2[-1],
+                                     y2[-1]])
+                # print theta1_init, theta2_init, theta1[-1], theta2[-1]
 
 def main():
-    simulate_pendulum(10)
+    simulate_pendulum(5)
 
 if __name__ == "__main__":
     main()
