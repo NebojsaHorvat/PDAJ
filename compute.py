@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 from scipy.integrate import odeint
-
+import argparse
 # The gravitational acceleration (m.s-2).
 g = 9.81
 
@@ -76,6 +76,20 @@ def simulate_pendulum(theta_resolution):
                 # print theta1_init, theta2_init, theta1[-1], theta2[-1]
 
 def main():
+    parser = argparse.ArgumentParser(
+    )
+    parser.add_argument(
+        '-r',
+        '--resolution',
+        dest='resolution',
+        metavar='resolution',
+        default=5,
+        help="Define lvl of precision"
+    )
+    args = parser.parse_args()
+
+    resolution = args.resolution
+    print "resolution ", resolution
     simulate_pendulum(5)
 
 if __name__ == "__main__":
