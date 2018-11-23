@@ -2,6 +2,7 @@ import sys
 import numpy as np
 from scipy.integrate import odeint
 import argparse
+from multiprocessing import Pool
 # The gravitational acceleration (m.s-2).
 g = 9.81
 
@@ -55,8 +56,8 @@ def simulate_pendulum(theta_resolution,tmax,dt,resoutls_file):
                                      'y1',
                                      'x2',
                                      'y2'])
-
-        results = map(solve, generate_parameters(L1, L2, m1, m2, tmax, dt, theta_resolution) )
+        p = Pool()
+        results = p.map(solve, generate_parameters(L1, L2, m1, m2, tmax, dt, theta_resolution) )
 
         for result in results:
             theta1_init, theta2_init, theta1, theta2, x1, y1, x2, y2 = result
