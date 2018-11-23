@@ -20,7 +20,8 @@ def deriv(y, t, L1, L2, m1, m2):
              m2*L2*z2**2*s*c) / L2 / (m1 + m2*s**2)
     return theta1dot, z1dot, theta2dot, z2dot
 
-def solve(L1, L2, m1, m2, tmax, dt, y0):
+def solve(tp):
+    L1, L2, m1, m2, tmax, dt, y0 = tp
     t = np.arange(0, tmax+dt, dt)
 
     # Do the numerical integration of the equations of motion
@@ -33,7 +34,7 @@ def solve(L1, L2, m1, m2, tmax, dt, y0):
     x2 = x1 + L2 * np.sin(theta2)
     y2 = y1 - L2 * np.cos(theta2)
 
-    return theta1, theta2, x1, y1, x2, y2
+    return y0[0], y0[2], theta1, theta2, x1, y1, x2, y2
 
 def simulate_pendulum(theta_resolution,tmax,dt,resoutls_file):
     # Pendulum rod lengths (m), bob masses (kg).
@@ -45,7 +46,7 @@ def simulate_pendulum(theta_resolution,tmax,dt,resoutls_file):
 
     # Means to run to csv
     import csv
-    with open(resoutls_file + '.csv', 'wb') as csvfile:
+    with open(resoutls_file+'.csv', 'wb') as csvfile:
         spamwriter = csv.writer(csvfile)
         spamwriter.writerow(['theta1_init', 'theta2_init',
                                      'theta1',
@@ -55,25 +56,30 @@ def simulate_pendulum(theta_resolution,tmax,dt,resoutls_file):
                                      'x2',
                                      'y2'])
 
-        for theta1_init in np.linspace(0, 2*np.pi, theta_resolution):
-            for theta2_init in np.linspace(0, 2*np.pi, theta_resolution):
-                # Initial conditions: theta1, dtheta1/dt, theta2, dtheta2/dt.
-                y0 = np.array([
-                    theta1_init,
-                    0.0,
-                    theta2_init,
-                    0.0
-                ])
+        results = map(solve, generate_parameters(L1, L2, m1, m2, tmax, dt, theta_resolution) )
 
-                theta1, theta2, x1, y1, x2, y2 = solve(L1, L2, m1, m2, tmax, dt, y0)
-                spamwriter.writerow([theta1_init, theta2_init,
-                                     theta1[-1],
-                                     theta2[-1],
-                                     x1[-1],
-                                     y1[-1],
-                                     x2[-1],
-                                     y2[-1]])
-                # print theta1_init, theta2_init, theta1[-1], theta2[-1]
+        for result in results:
+            theta1_init, theta2_init, theta1, theta2, x1, y1, x2, y2 = result
+            spamwriter.writerow([theta1_init,
+                                 theta2_init,
+                                 theta1[-1],
+                                 theta2[-1],
+                                 x1[-1],
+                                 y1[-1],
+                                 x2[-1],
+                                 y2[-1]])
+
+def generate_parameters(L1, L2, m1, m2, tmax, dt, theta_resolution):
+    for theta1_init in np.linspace(0, 2 * np.pi, theta_resolution):
+        for theta2_init in np.linspace(0, 2 * np.pi, theta_resolution):
+            # Initial conditions: theta1, dtheta1/dt, theta2, dtheta2/dt.
+            y0 = np.array([
+                theta1_init,
+                0.0,
+                theta2_init,
+                0.0
+            ])
+            yield L1, L2, m1, m2, tmax, dt, y0
 
 def main():
     parser = argparse.ArgumentParser(
