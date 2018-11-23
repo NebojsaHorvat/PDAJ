@@ -35,17 +35,17 @@ def solve(L1, L2, m1, m2, tmax, dt, y0):
 
     return theta1, theta2, x1, y1, x2, y2
 
-def simulate_pendulum(theta_resolution):
+def simulate_pendulum(theta_resolution,tmax,dt,resoutls_file):
     # Pendulum rod lengths (m), bob masses (kg).
     L1, L2 = 1.0, 1.0
     m1, m2 = 1.0, 1.0
 
     # Maximum time, time point spacings (all in s).
-    tmax, dt = 30.0, 0.01
+    # tmax, dt = 30.0, 0.01
 
     # Means to run to csv
     import csv
-    with open('results.csv', 'wb') as csvfile:
+    with open(resoutls_file+'.csv', 'wb') as csvfile:
         spamwriter = csv.writer(csvfile)
         spamwriter.writerow(['theta1_init', 'theta2_init',
                                      'theta1',
@@ -86,11 +86,42 @@ def main():
         default=5,
         help="Define lvl of precision"
     )
+    parser.add_argument(
+        '-dt',
+        '--delta-time',
+        dest='dt',
+        metavar='dt',
+        default=0.01,
+        help="Define dt"
+    )
+    parser.add_argument(
+        '-tm',
+        '--time-max',
+        dest='time_max',
+        metavar='time_max',
+        default=30,
+        help="Define lvl of precision"
+    )
+    parser.add_argument(
+        '-f',
+        '--results-file',
+        dest='results_file',
+        metavar='results_file',
+        default='results',
+        help="Define name of results file"
+    )
     args = parser.parse_args()
 
-    resolution = args.resolution
-    print "resolution ", resolution
-    simulate_pendulum(5)
+    resolution = float(args.resolution)
+    resoutls_file = args.results_file
+    dt = float(args.dt)
+    tmax = float(args.time_max)
+    print "resolution: ", resolution
+    print "dt: ", dt
+    print "tmax: ", tmax
+    print "result file: ", resoutls_file
+
+    simulate_pendulum(resolution,tmax,dt,resoutls_file)
 
 if __name__ == "__main__":
     main()
