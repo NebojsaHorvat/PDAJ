@@ -114,7 +114,7 @@ def main():
         '--results-file',
         dest='results_file',
         metavar='results_file',
-        default='results',
+        default='results_parallel',
         help="Define name of results file"
     )
     args = parser.parse_args()
